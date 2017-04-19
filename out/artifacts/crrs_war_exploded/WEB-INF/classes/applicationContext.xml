@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/context
+    	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <!--方式一：引入数据库配置文件，加载properties文件
+    <context:property-placeholder location="classpath:db.properties"/>-->
+    <!--方式二：引入数据库配置文件，加载properties文件-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:db.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driverClass}">
+        </property>
+        <property name="url"
+                  value="${url}">
+        </property>
+        <property name="username" value="${username}"></property>
+    </bean>
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/> <!-- 加载hibernate配置文件 -->
+    </bean>
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <tx:advice id="advice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <!-- 配置哪些包的类要切入事务 -->
+        <aop:pointcut id="pointcut" expression="execution(* com.mryoung.service.impl.*.*(..))" />
+        <aop:advisor advice-ref="advice" pointcut-ref="pointcut" />
+        <!--连接了上面的advice和上面的pointcut -->
+        <!-- aop:pointcut要写在aop:advisor上面，否则会报错 -->
+    </aop:config>
+    <bean id="baceService" class="com.mryoung.service.impl.BaseServiceImpl" lazy-init="true">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="userService" class="com.mryoung.service.impl.UserServiceImpl" parent="baceService"/>
+    <!-- 如果是prototype类型，默认是使用时创建，不是启动时自动创建 -->
+    <bean id="baseAction" class="com.mryoung.action.BaseAction" scope="prototype">
+        <property name="userService" ref="userService"/>
+    </bean>
+    <bean id="loginAction" class="com.mryoung.action.LoginAction" parent="baseAction" scope="prototype"/>
+</beans>

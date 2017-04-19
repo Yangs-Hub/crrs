@@ -32,6 +32,10 @@ public class BaseServiceImpl<T> implements BaseService<T> {
         this.sessionFactory = sessionFactory;
     }
 
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
     public Session getSession(){
         // 从当前线程获取session，如果没有则创建一个新的session
         return sessionFactory.getCurrentSession();

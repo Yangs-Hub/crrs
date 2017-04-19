@@ -51,20 +51,18 @@
     </tx:advice>
     <aop:config>
         <!-- 配置哪些包的类要切入事务 -->
-        <aop:pointcut id="pointcut"
-                      expression="execution(* com.mryoung.service.impl.*.*(..))" />
-        <aop:advisor advice-ref="advice" pointcut-ref="pointcut" /><!--连接了上面的advice和上面的pointcut -->
+        <aop:pointcut id="pointcut" expression="execution(* com.mryoung.service.impl.*.*(..))" />
+        <aop:advisor advice-ref="advice" pointcut-ref="pointcut" />
+        <!--连接了上面的advice和上面的pointcut -->
         <!-- aop:pointcut要写在aop:advisor上面，否则会报错 -->
     </aop:config>
     <bean id="baceService" class="com.mryoung.service.impl.BaseServiceImpl" lazy-init="true">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
-    <bean id="userService" class="com.mryoung.service.impl.UserServiceImpl" parent="baceService">
-        <property name="sessionFactory" ref="sessionFactory"/>
-    </bean>
+    <bean id="userService" class="com.mryoung.service.impl.UserServiceImpl" parent="baceService"/>
     <!-- 如果是prototype类型，默认是使用时创建，不是启动时自动创建 -->
     <bean id="baseAction" class="com.mryoung.action.BaseAction" scope="prototype">
         <property name="userService" ref="userService"/>
     </bean>
-    <bean id="loginAction" class="com.mryoung.action.LoginAction" parent="baceService" scope="prototype"/>
+    <bean id="loginAction" class="com.mryoung.action.LoginAction" parent="baseAction" scope="prototype"/>
 </beans>

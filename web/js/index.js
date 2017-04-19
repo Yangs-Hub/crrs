@@ -57,13 +57,13 @@ $(function() {
      */
     $("#btn-login").on("click", function() {
         // 获取登录信息
-        var login_info = {};
-        login_info.name = $(".form-horizontal input").eq(0).val();
-        login_info.s_password = $(".form-horizontal input").eq(1).val();
+        var user = {};
+        user.username = $(".form-horizontal input").eq(0).val();
+        user.password = $(".form-horizontal input").eq(1).val();
         // login_info.rember_me = document.querySelector("input[name=rember-me").checked;
 
         // 发送ajax请求到server进行用户登录
-        requestLogin(login_info);
+        requestLogin(user);
     })
 
     $("#dropdownMenu1").hover(function () {

@@ -14,8 +14,9 @@ import org.springframework.stereotype.Controller;
 @Controller("login")
 @Scope("prototype")
 public class LoginAction extends BaseAction<User> {
-    public String login(User user) {
-        System.out.println(user.getUsername());
+
+    public String login() {
+        System.out.println(model.getUsername());
         return "index";
     }
 }
